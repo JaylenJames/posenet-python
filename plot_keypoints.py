@@ -18,9 +18,15 @@ import pandas as pd
 df = pd.read_csv('thesavedones.csv', header=None)
 
 #Nose locations
-data = df.loc[::17,3]
+part_data_df= df.iloc[::17,3]
 
-reorg = pd.DataFrame(data, columns = ['Nose'])
+part_data_split_df = part_data_df.str.split(" ",expand=True) #splits string into muliple columns
+
+
+
+#part_data_df = part_data_df.astype(int) #convert keypoint coordinates to integer values
+
+reorg = pd.DataFrame(part_data_df, columns = ['Nose'])
 
 
 # Generate plots of keypoint coordinate position vs time.
