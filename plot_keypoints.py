@@ -30,8 +30,14 @@ part_edit2_df = part_edit_df.map(lambda x: x.replace("   ",",").replace("  ",","
 part_split_df = part_edit2_df.str.split(",",expand=True)
 
 
-#part_data_ints_df = part_split_df["0"].astype(int) #convert keypoint coordinates to integer values
-#part_data_ints_df = pd.to_numeric(part_split_df)
+#convert keypoint coordinates to integer values
+#part_data_ints_df = part_split_df["0"].astype(int) 
+part_data_ints_col0_df = pd.to_numeric(part_split_df[0])
+part_data_ints_col1_df = pd.to_numeric(part_split_df[1])
+
+#Concatenate columns
+part_location_data = pd.concat([part_data_ints_col0_df, part_data_ints_col1_df], axis=1)
+
 
 reorg = pd.DataFrame(part_data_df, columns = ['Nose'])
 
