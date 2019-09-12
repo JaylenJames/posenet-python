@@ -11,6 +11,7 @@ Meeting:
     
 """
 import pandas as pd
+import matplotlib.pyplot as plt
 
 #Edit data within file.
 
@@ -19,7 +20,9 @@ df = pd.read_csv('thesavedones.csv', header=None)
 
 #Nose locations
 part_data_df= df.iloc[::17,3]
+rankle_data_df = df.iloc[::13,3]
 
+    #Create loop to perform this data manipulation for each data set, starting here:
 #Remove brackets and spaces before string and after numbers.
 part_edit_df = part_data_df.map(lambda x: x.lstrip('[ ').rstrip(' ]'))
 
@@ -37,9 +40,13 @@ part_data_ints_col1_df = pd.to_numeric(part_split_df[1])
 
 #Concatenate columns
 part_location_data = pd.concat([part_data_ints_col0_df, part_data_ints_col1_df], axis=1)
+    #And ending here.
 
-
-reorg = pd.DataFrame(part_data_df, columns = ['Nose'])
+reorg = pd.DataFrame(part_location_data, columns = ['Nose-x', 'Nose-y'])
 
 
 # Generate plots of keypoint coordinate position vs time.
+
+plt.plot(part_location_data[0])
+plt.show()
+
