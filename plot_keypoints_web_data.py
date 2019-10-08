@@ -7,7 +7,7 @@ Code will plot the keypoint coordinates vs time in order to assign the maximum
     value from this plot to the real-world distance measurement. This will be
     the label.
     
-Meeting: 
+Coding Improvement Note: Make use of functions for things like this.
     
 """
 import pandas as pd
@@ -19,6 +19,7 @@ from scipy.signal import peak_prominences
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LinearRegression
 
 #Edit data within file.
 
@@ -327,6 +328,15 @@ RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
             min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=None,
             oob_score=False, random_state=0, verbose=0, warm_start=False)
 print("Random Forest Score:",clf.score(exp_data_feats, exp_data_lables.values.ravel()))
+
+
+#Regression Attempt: 
+reg = LinearRegression().fit(exp_data_feats, exp_data_lables.values.ravel())
+print("Regression Score:", reg.score(exp_data_feats, exp_data_lables.values.ravel()))
+
+
+
+
 
 
 ###############################################################################
