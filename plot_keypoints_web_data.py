@@ -16,6 +16,9 @@ import numpy as np
 from scipy.signal import find_peaks
 from scipy.signal import medfilt
 from scipy.signal import peak_prominences
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn import svm
+from sklearn.ensemble import RandomForestClassifier
 
 #Edit data within file.
 
@@ -38,9 +41,16 @@ real_measures = np.array([32,33,32,35,35,
                           30,31,33,23,25,28,28,29,31,42,
                           32,31.5,24,29,37,36,31,34,28,33.5,
                           38,38,42,42,42,41,43,38,39,40,
-                          32,34,41,36,36,35,37,36,38,40])
+                          32,34,41,36,36,35,37,36,38,40]) #Document real measures
     
 real_measures_df = pd.DataFrame(data=real_measures[0:]) #Convert to a DataFrame
+
+
+#Tabulate height and weight columns
+heights_df = pd.DataFrame({"Height": [69]*50 + [69.5]*10 + [67]*10}) #Heights in inches
+
+weights_df = pd.DataFrame({"Weight": [165]*50 + [215]*10 + [160]*10}) #Weights in pounds
+
 
 #Assign x and y position values to variables
 x_rknee1 = rknee1_df[0]
@@ -277,10 +287,50 @@ max_promsy_all = pd.concat([max_promsy_1, max_promsy_2,
 
 
 ######################## Concatenate Columns ##################################
-exp_data = pd.concat([max_promsx_all, max_promsy_all, real_measures_df], axis=1)
+exp_data = pd.concat([max_promsx_all, max_promsy_all, heights_df, weights_df, 
+                      real_measures_df], axis=1)
+
+exp_data_feats = pd.concat([max_promsx_all, max_promsy_all, heights_df, weights_df], axis = 1)
+
+exp_data_lables = real_measures_df
+
+exp_data_feats = exp_data_feats.astype('int')
+exp_data_lables = exp_data_lables.astype('int')
+           
+
+#Classification Attempt: LDA 
+clf = LinearDiscriminantAnalysis()
+LinearDiscriminantAnalysis(n_components=4, priors=None, shrinkage=None,
+              solver='eigen', store_covariance=False, tol=0.0001)
+clf.fit(exp_data_feats, exp_data_lables.values.ravel())
+print("LDA Score:", clf.score(exp_data_feats, exp_data_lables.values.ravel()))
 
 
+#Classification Attempt: Multi-Class Calssification Support Vector Machine
+clf = svm.SVC(gamma='scale', decision_function_shape='ovo')
+clf.fit(exp_data_feats, exp_data_lables.values.ravel()) 
+svm.SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
+    decision_function_shape='ovo', degree=3, gamma='scale', kernel='rbf',
+    max_iter=-1, probability=False, random_state=None, shrinking=True,
+    tol=0.001, verbose=False)
+print("SVM Score:",clf.score(exp_data_feats, exp_data_lables.values.ravel()))
 
+
+#Classification Attempt: Random Forest
+clf = RandomForestClassifier(n_estimators=100, max_depth=4, random_state=0)
+clf.fit(exp_data_feats, exp_data_lables.values.ravel())
+
+RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+            max_depth=2, max_features='auto', max_leaf_nodes=None,
+            min_impurity_decrease=0.0, min_impurity_split=None,
+            min_samples_leaf=1, min_samples_split=2,
+            min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=None,
+            oob_score=False, random_state=0, verbose=0, warm_start=False)
+print("Random Forest Score:",clf.score(exp_data_feats, exp_data_lables.values.ravel()))
+
+
+###############################################################################
+################# Old but possibly useful code for later #####################
 #Idea 4 - Smooth with median filter, then use my method not find peaks 
 #bc idk how to get mins: Thanks Ryan McG!
 
